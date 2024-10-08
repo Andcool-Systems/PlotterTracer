@@ -1,13 +1,9 @@
-package com.andcool.javafx_test;
-
-import javafx.util.Pair;
+package com.andcool.Tracer;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.List;
-
-import static java.lang.String.format;
 
 public class Files {
     public static void export(List<String> gCode) throws IOException {

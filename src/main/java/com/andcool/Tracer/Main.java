@@ -1,5 +1,8 @@
-package com.andcool.javafx_test;
+package com.andcool.Tracer;
 
+
+import com.andcool.Tracer.sillyLogger.Level;
+import com.andcool.Tracer.sillyLogger.SillyLogger;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.geometry.Insets;
@@ -7,15 +10,14 @@ import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.*;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
 import javafx.scene.image.*;
-import javafx.scene.image.Image;
-import javafx.scene.layout.*;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
-
+import javafx.util.Pair;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -24,13 +26,15 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import javafx.util.Pair;
+import static java.lang.String.format;
 
 public class Main extends Application {
     private static final int BATCH_SIZE = 50;
-    private List<Runnable> uiUpdates = new ArrayList<>();
+    private final List<Runnable> uiUpdates = new ArrayList<>();
+    private final SillyLogger logger = new SillyLogger("Main Thread", true, Level.DEBUG);
 
     private Image originalImage;
+    Image img;
     private ImageView processedImageView;
     private Slider thresholdSlider;
     private Label thresholdLabel;
@@ -44,7 +48,7 @@ public class Main extends Application {
     public void start(Stage primaryStage) {
         primaryStage.setTitle("JavaFX Test");
 
-        // Создание панели инструментов
+
         ToolBar toolBar = new ToolBar();
         Button btnLoadImage = new Button("Load image");
         toolBar.getItems().add(btnLoadImage);
@@ -64,29 +68,23 @@ public class Main extends Application {
             }
         });
 
-        // Создание ImageView для отображения обработанного изображения
         processedImageView = new ImageView();
         processedImageView.setPreserveRatio(true);
-        processedImageView.setFitWidth(400);
-        processedImageView.setFitHeight(400);
+        processedImageView.setFitWidth(800);
+        processedImageView.setFitHeight(800);
+        processedImageView.setOnScroll(e -> {
+        });
 
         canvas = new Canvas(1920, 1800);
 
-        // Создание ползунка для задания порога
         thresholdSlider = new Slider(0, 255, 128);
         thresholdSlider.valueProperty().addListener((observable, oldValue, newValue) -> {
-            thresholdLabel.setText("Порог: " + newValue.intValue());
-            applyThreshold(newValue.intValue());
+            updateProcessed();
         });
-
-        // Создание метки для отображения текущего порога
         thresholdLabel = new Label("Порог: 128");
-
-        // Создание панели для ползунка и метки
         HBox thresholdBox = new HBox(10, thresholdSlider, thresholdLabel);
         thresholdBox.setPadding(new Insets(10));
 
-        // Создание основного рабочего пространства
         imageBox = new HBox(10, processedImageView, canvas);
         imageBox.setPadding(new Insets(10));
 
@@ -94,13 +92,12 @@ public class Main extends Application {
         mainPane.setTop(new VBox(toolBar, thresholdBox));
         mainPane.setCenter(imageBox);
 
-        // Создание и установка сцены
         Scene scene = new Scene(mainPane, 1920, 1000);
         primaryStage.setScene(scene);
         primaryStage.show();
 
         Thread.setDefaultUncaughtExceptionHandler((thread, throwable) -> {
-            System.out.println(throwable.toString());
+            logger.log(Level.ERROR, throwable.toString());
         });
     }
 
@@ -113,7 +110,7 @@ public class Main extends Application {
             canvas.getGraphicsContext2D().clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
             WritableImage process_canvas = engine.copyImage(processedImageView.getImage());
             PixelWriter canvasWriter = process_canvas.getPixelWriter();
-            //float last_z = 2;
+            float last_z = 2;
 
             while (true) {
                 try {
@@ -122,13 +119,14 @@ public class Main extends Application {
 
                     Pair<Integer, Integer> finalLast_pixel = last_pixel;
                     int finalRadius = engine.radius;
+
                     canvasWriter.setColor(finalLast_pixel.getKey(), finalLast_pixel.getValue(), Color.WHITE);
                     uiUpdates.add(() -> {
                         drawLineOnCanvas(canvas,
-                                finalLast_pixel.getKey() * 2,
-                                finalLast_pixel.getValue() * 2,
-                                pixelData.getKey() * 2,
-                                pixelData.getValue() * 2,
+                                finalLast_pixel.getKey(),
+                                finalLast_pixel.getValue(),
+                                pixelData.getKey(),
+                                pixelData.getValue(),
                                 finalRadius == 1 ? Color.BLACK : Color.GREEN);
                     });
 
@@ -138,27 +136,22 @@ public class Main extends Application {
                         Platform.runLater(() -> updatesToRun.forEach(Runnable::run));
                     }
 
-                    /*
                     Pair<Float, Float> point = new Pair<>(
-                            pixelData.getKey() / 400.f * 100.f + 50,
-                            pixelData.getValue() / 400.f * 100.f + 50
+                            pixelData.getKey() / 800.f * 100.f + 50,
+                            pixelData.getValue() / 800.f * 100.f + 50
                     );
-
 
                     float z = engine.radius == 1 ? 0.1f : 2;
                     if (z != last_z) {
                         gCode.addLast(format("G0 Z%f\n", z).replaceAll(",", "."));
                         last_z = z;
                     }
-                    gCode.addLast(format("G1 X%f Y%f F1200\n", point.getKey(), point.getValue()).replaceAll(",", "."));
-                     */
-
+                    gCode.addLast(format("G1 X%f Y%f F2200\n", point.getKey(), point.getValue()).replaceAll(",", "."));
 
                     last_pixel = pixelData;
                     //Thread.sleep(0, 1);
                 } catch (InternalError e) {
-                    System.out.println(e.toString());
-                    break;
+                    logger.log(Level.ERROR, e.toString());
                 }
             }
             if (!uiUpdates.isEmpty()) {
@@ -166,16 +159,12 @@ public class Main extends Application {
                 uiUpdates.clear();
                 Platform.runLater(() -> updatesToRun.forEach(Runnable::run));
             }
-            System.out.println("end");
+            logger.log(Level.INFO, "end");
         }
     }
 
     private void Render() {
         if (thread1.isAlive()) return;
-        imageBox.getChildren().remove(1);
-        canvas = new Canvas(800, 800);
-        imageBox.getChildren().add(1, canvas);
-
         thread1 = new SliceThread();
         thread1.setDaemon(true);
         thread1.start();
@@ -191,36 +180,33 @@ public class Main extends Application {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Выберите изображение");
 
-        // Установка фильтров для файлов изображений
         FileChooser.ExtensionFilter imageFilter = new FileChooser.ExtensionFilter(
                 "Изображения", "*.png", "*.jpg", "*.jpeg", "*.bmp", "*.jfif");
         fileChooser.getExtensionFilters().add(imageFilter);
 
-        // Открытие диалогового окна и получение выбранного файла
         File file = fileChooser.showOpenDialog(stage);
         if (file != null) {
             try {
-                // Загрузка изображения
-                originalImage = scaleImage(new Image(new FileInputStream(file)), (int) processedImageView.getFitWidth(), (int) processedImageView.getFitHeight());
-                // Применение пороговой фильтрации с текущим значением порога
-                applyThreshold((int) thresholdSlider.getValue());
+                img = new Image(new FileInputStream(file));
+                updateProcessed();
             } catch (FileNotFoundException ex) {
                 showAlert(Alert.AlertType.ERROR, "Ошибка", "Не удалось загрузить изображение.");
             }
         }
     }
 
-    private void applyThreshold(int threshold) {
-        if (originalImage == null) {
-            processedImageView.setImage(null);
-            return;
-        }
+    private void updateProcessed() {
+        Image processedImage = insetImage(img, processedImageView);
+        processedImage = applyThreshold(processedImage, (int) thresholdSlider.getValue());
+        processedImageView.setImage(processedImage);
+    }
 
-        int width = (int) originalImage.getWidth();
-        int height = (int) originalImage.getHeight();
+    private WritableImage applyThreshold(Image img, int threshold) {
+        int width = (int) img.getWidth();
+        int height = (int) img.getHeight();
 
         WritableImage processedImage = new WritableImage(width, height);
-        PixelReader pixelReader = originalImage.getPixelReader();
+        PixelReader pixelReader = img.getPixelReader();
         PixelWriter pixelWriter = processedImage.getPixelWriter();
 
         for (int y = 0; y < height; y++) {
@@ -231,27 +217,48 @@ public class Main extends Application {
                 pixelWriter.setColor(x, y, newColor);
             }
         }
-
-        processedImageView.setImage(processedImage);
+        return processedImage;
     }
 
-    public static WritableImage scaleImage(Image inputImage, int targetWidth, int targetHeight) {
-        WritableImage scaledImage = new WritableImage(targetWidth, targetHeight);
-        PixelReader pixelReader = inputImage.getPixelReader();
-        PixelWriter pixelWriter = scaledImage.getPixelWriter();
+    public static WritableImage insetImage(
+            Image img,
+            ImageView processedImageView
+    ) {
+        int canvasWidth = (int) processedImageView.getFitWidth();
+        int canvasHeight = (int) processedImageView.getFitHeight();
 
-        int originalWidth = (int) inputImage.getWidth();
-        int originalHeight = (int) inputImage.getHeight();
+        int originalWidth = (int) img.getWidth();
+        int originalHeight = (int) img.getHeight();
+
+        float factor = img.getWidth() > img.getHeight() ?
+                (float) canvasWidth / originalWidth :
+                (float) canvasHeight / originalHeight;
+
+        int targetWidth = (int) (originalWidth * factor);
+        int targetHeight = (int) (originalHeight * factor);
+
+        int posX = (int) ((canvasWidth - (originalWidth * factor)) / 2);
+        int posY = (int) ((canvasHeight - (originalHeight * factor)) / 2);
+
+        WritableImage scaledImage = new WritableImage(canvasWidth, canvasHeight);
+        PixelReader pixelReader = img.getPixelReader();
+
+        Canvas canvas = new Canvas(canvasWidth, canvasHeight);
+        GraphicsContext gc = canvas.getGraphicsContext2D();
+        PixelWriter pixelWriter = gc.getPixelWriter();
+
+        gc.setFill(Color.WHITE);
+        gc.fillRect(0, 0, canvasWidth, canvasHeight);
 
         for (int y = 0; y < targetHeight; y++) {
             for (int x = 0; x < targetWidth; x++) {
                 int origX = (int) ((double) x / targetWidth * originalWidth);
                 int origY = (int) ((double) y / targetHeight * originalHeight);
                 Color color = pixelReader.getColor(origX, origY);
-                pixelWriter.setColor(x, y, color);
+                pixelWriter.setColor(x + posX, y + posY, color);
             }
         }
-
+        canvas.snapshot(null, scaledImage);
         return scaledImage;
     }
 

@@ -1,4 +1,4 @@
-package com.andcool.javafx_test;
+package com.andcool.Tracer;
 
 import javafx.scene.image.Image;
 import javafx.util.Pair;

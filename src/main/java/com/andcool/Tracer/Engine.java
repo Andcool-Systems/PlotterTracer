@@ -1,4 +1,4 @@
-package com.andcool.javafx_test;
+package com.andcool.Tracer;
 
 
 import javafx.scene.image.Image;
@@ -8,15 +8,13 @@ import javafx.scene.image.WritableImage;
 import javafx.scene.paint.Color;
 import javafx.util.Pair;
 
-import static java.lang.Math.max;
-
 public class Engine {
     private final Worker[] workers;
     public int lastWorker = 0;
     public int radius = 1;
 
-    Engine () {
-        workers = new Worker[] {
+    Engine() {
+        workers = new Worker[]{
                 this::top,
                 this::right,
                 this::bottom,
@@ -31,7 +29,8 @@ public class Engine {
                 if (pixelReader.getColor(pixelPos.getKey() + x, pixelPos.getValue() - radius).getBrightness() < 1) {
                     return new Pair<>(pixelPos.getKey() + x, pixelPos.getValue() - radius);
                 }
-            } catch (IndexOutOfBoundsException ignored) {}
+            } catch (IndexOutOfBoundsException ignored) {
+            }
         }
         return null;
     }
@@ -43,7 +42,8 @@ public class Engine {
                 if (pixelReader.getColor(pixelPos.getKey() + radius, pixelPos.getValue() + y).getBrightness() < 1) {
                     return new Pair<>(pixelPos.getKey() + radius, pixelPos.getValue() + y);
                 }
-            } catch (IndexOutOfBoundsException ignored) {}
+            } catch (IndexOutOfBoundsException ignored) {
+            }
         }
         return null;
     }
@@ -55,7 +55,8 @@ public class Engine {
                 if (pixelReader.getColor(pixelPos.getKey() + x, pixelPos.getValue() + radius).getBrightness() < 1) {
                     return new Pair<>(pixelPos.getKey() + x, pixelPos.getValue() + radius);
                 }
-            } catch (IndexOutOfBoundsException ignored) {}
+            } catch (IndexOutOfBoundsException ignored) {
+            }
         }
         return null;
     }
@@ -67,7 +68,8 @@ public class Engine {
                 if (pixelReader.getColor(pixelPos.getKey() - radius, pixelPos.getValue() + y).getBrightness() < 1) {
                     return new Pair<>(pixelPos.getKey() - radius, pixelPos.getValue() + y);
                 }
-            } catch (IndexOutOfBoundsException ignored) {}
+            } catch (IndexOutOfBoundsException ignored) {
+            }
         }
         return null;
     }
@@ -77,7 +79,9 @@ public class Engine {
         radius = 1;
         while (true) {
             for (int number = 0; number < 4; number++) {
-                int worker = max((number + lastWorker) % 4, 0);
+                int worker = (number + lastWorker) % 4;
+                if (worker < 0) worker += 4;
+
                 Pair<Integer, Integer> result = workers[worker].work(image, radius, last_pixel);
                 if (result != null) {
                     this.lastWorker = worker - 1;
