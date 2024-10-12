@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.VBox?>
+<VBox xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
+      fx:controller="com.andcool.Tracer.Controllers.MainController" spacing="10" stylesheets="@styles/main.css">
+    <ToolBar>
+        <Button text="Load image" onAction="#loadImage"/>
+        <Button text="Render" onAction="#render"/>
+        <Button text="Export"/>
+    </ToolBar>
+    <HBox spacing="10">
+        <Slider fx:id="threshold" value="180" max="255"/>
+        <Label fx:id="thresholdLabel" text="Threshold: 180"/>
+    </HBox>
+    <HBox>
+        <ImageView fx:id="filteredImage" fitWidth="800" fitHeight="800" smooth="false"/>
+        <ScrollPane
+                vbarPolicy="NEVER"
+                hbarPolicy="NEVER"
+                prefWidth="800"
+                prefHeight="800"
+                fitToWidth="true"
+                fx:id="scrollPane"
+                fitToHeight="true">
+
+            <Pane fx:id="pane" minWidth="800" minHeight="800"/>
+        </ScrollPane>
+    </HBox>
+</VBox>
