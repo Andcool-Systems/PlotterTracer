@@ -1,28 +1,25 @@
 package com.andcool.Tracer;
 
+import com.andcool.Tracer.sillyLogger.Level;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
+import java.util.Objects;
+
 public class Config {
-    private void openSettingsWindow() {
+    public void openSettingsWindow() {
         try {
-            // Загружаем fxml-файл (если используется)
-            // Parent root = FXMLLoader.load(getClass().getResource("settings.fxml"));
+            Parent root = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("configView.fxml")));
+            Scene scene = new Scene(root, 500, 500);
 
-            // Либо можно создать элементы без fxml:
-            VBox root = new VBox();
-            Scene scene = new Scene(root, 250, 150);
-
-            // Создаем новое окно
             Stage settingsStage = new Stage();
-            settingsStage.setTitle("Настройки");
+            settingsStage.setTitle("Machine settings");
             settingsStage.setScene(scene);
-
-            // Показываем новое окно
             settingsStage.show();
         } catch (Exception e) {
-            e.printStackTrace();
+            Main.logger.log(Level.ERROR, e, true);
         }
     }
 }

@@ -100,6 +100,7 @@ public class ImageManager {
     }
 
     public void updateProcessed() {
+        if (Main.imageManager.sourceImage == null) return;
         processedImage = applyThreshold(Main.imageManager.sourceImage, (int) Main.controller.threshold.getValue());
         processedImage = insetImage(processedImage, Main.controller.filteredImage);
         Main.controller.filteredImage.setImage(processedImage);

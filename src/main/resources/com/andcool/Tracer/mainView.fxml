@@ -2,32 +2,47 @@
 
 <?import javafx.scene.control.*?>
 <?import javafx.scene.image.ImageView?>
-<?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.Pane?>
-<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.shape.Rectangle?>
 <VBox xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
       fx:controller="com.andcool.Tracer.Controllers.MainController" spacing="10" stylesheets="@styles/main.css">
+    <MenuBar>
+        <Menu text="File">
+            <MenuItem text="Open image" onAction="#loadImage"/>
+            <MenuItem text="Machine settings" onAction="#openConfig"/>
+        </Menu>
+    </MenuBar>
     <ToolBar>
-        <Button text="Load image" onAction="#loadImage"/>
         <Button text="Render" onAction="#render"/>
         <Button text="Export"/>
     </ToolBar>
     <HBox spacing="10">
-        <Slider fx:id="threshold" value="180" max="255"/>
+        <Slider fx:id="threshold" max="255"/>
         <Label fx:id="thresholdLabel" text="Threshold: 180"/>
     </HBox>
-    <HBox>
-        <ImageView fx:id="filteredImage" fitWidth="800" fitHeight="800" smooth="false"/>
-        <ScrollPane
-                vbarPolicy="NEVER"
-                hbarPolicy="NEVER"
-                prefWidth="800"
-                prefHeight="800"
-                fitToWidth="true"
-                fx:id="scrollPane"
-                fitToHeight="true">
+    <HBox spacing="10">
+        <VBox
+                prefWidth="802"
+                prefHeight="802"
+                alignment="CENTER"
+                style="-fx-border-color: #000; -fx-border-width: 1px; -fx-border-style: solid;"
+        >
+            <ImageView
+                    fx:id="filteredImage"
+                    fitWidth="800"
+                    fitHeight="800"
+                    smooth="false"
+            />
+        </VBox>
 
+        <Pane
+                prefWidth="802"
+                prefHeight="802"
+                fx:id="paneParent">
+            <clip>
+                <Rectangle width="802" height="802"/>
+            </clip>
             <Pane fx:id="pane" minWidth="800" minHeight="800"/>
-        </ScrollPane>
+        </Pane>
     </HBox>
 </VBox>

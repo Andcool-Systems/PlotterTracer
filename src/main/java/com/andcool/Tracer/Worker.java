@@ -1,8 +1,8 @@
 package com.andcool.Tracer;
 
+import javafx.geometry.Point2D;
 import javafx.scene.image.Image;
-import javafx.util.Pair;
 
 public interface Worker {
-    Pair<Integer, Integer> work(Image image, int radius, Pair<Integer, Integer> pixelPos);
+    Point2D work(Image image, int radius, Point2D pixelPos);
 }

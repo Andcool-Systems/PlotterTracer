@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<VBox xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml" spacing="5"
+      fx:controller="com.andcool.Tracer.Controllers.ConfigController">
+    <HBox alignment="CENTER_LEFT">
+        <TextField onKeyTyped="#filterCharacters"/>
+        <Label text="mm Print width" style="-fx-font-family: 'Roboto'; -fx-font-weight: bold;"/>
+    </HBox>
+    <HBox alignment="CENTER_LEFT">
+        <TextField onKeyTyped="#filterCharacters"/>
+        <Label text="mm Print height" style="-fx-font-family: 'Roboto'; -fx-font-weight: bold;"/>
+    </HBox>
+    <HBox alignment="CENTER_LEFT">
+        <TextField onKeyTyped="#filterCharactersFloat"/>
+        <Label text="mm Line width" style="-fx-font-family: 'Roboto'; -fx-font-weight: bold;"/>
+    </HBox>
+</VBox>
