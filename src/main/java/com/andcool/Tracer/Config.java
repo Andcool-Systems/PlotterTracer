@@ -1,20 +1,24 @@
 package com.andcool.Tracer;
 
-import com.andcool.Tracer.sillyLogger.Level;
+import com.andcool.Tracer.Controllers.ConfigController;
+import com.andcool.Tracer.SillyLogger.Level;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
-import java.util.Objects;
-
 public class Config {
+    public static ConfigController controller;
+    public static Stage settingsStage;
+
     public void openSettingsWindow() {
         try {
-            Parent root = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("configView.fxml")));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("configView.fxml"));
+            Parent root = loader.load();
+            controller = loader.getController();
             Scene scene = new Scene(root, 500, 500);
 
-            Stage settingsStage = new Stage();
+            settingsStage = new Stage();
             settingsStage.setTitle("Machine settings");
             settingsStage.setScene(scene);
             settingsStage.show();

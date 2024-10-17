@@ -1,4 +1,4 @@
-package com.andcool.Tracer.sillyLogger;
+package com.andcool.Tracer.SillyLogger;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;

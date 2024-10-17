@@ -1,8 +1,8 @@
 package com.andcool.Tracer;
 
 
-import com.andcool.Tracer.sillyLogger.Level;
-import com.andcool.Tracer.sillyLogger.SillyLogger;
+import com.andcool.Tracer.SillyLogger.Level;
+import com.andcool.Tracer.SillyLogger.SillyLogger;
 import javafx.geometry.Point2D;
 import javafx.scene.image.Image;
 import javafx.scene.image.PixelReader;

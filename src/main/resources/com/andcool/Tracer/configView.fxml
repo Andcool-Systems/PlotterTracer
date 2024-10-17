@@ -6,15 +6,16 @@
 <VBox xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml" spacing="5"
       fx:controller="com.andcool.Tracer.Controllers.ConfigController">
     <HBox alignment="CENTER_LEFT">
-        <TextField onKeyTyped="#filterCharacters"/>
+        <TextField onKeyTyped="#filterCharacters" fx:id="width_el"/>
         <Label text="mm Print width" style="-fx-font-family: 'Roboto'; -fx-font-weight: bold;"/>
     </HBox>
     <HBox alignment="CENTER_LEFT">
-        <TextField onKeyTyped="#filterCharacters"/>
+        <TextField onKeyTyped="#filterCharacters" fx:id="height_el"/>
         <Label text="mm Print height" style="-fx-font-family: 'Roboto'; -fx-font-weight: bold;"/>
     </HBox>
     <HBox alignment="CENTER_LEFT">
-        <TextField onKeyTyped="#filterCharactersFloat"/>
+        <TextField onKeyTyped="#filterCharactersFloat" fx:id="line_width_el"/>
         <Label text="mm Line width" style="-fx-font-family: 'Roboto'; -fx-font-weight: bold;"/>
     </HBox>
+    <Button text="save" onAction="#save"/>
 </VBox>

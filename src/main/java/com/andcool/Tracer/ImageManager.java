@@ -1,9 +1,12 @@
 package com.andcool.Tracer;
 
-import com.andcool.Tracer.sillyLogger.Level;
+import com.andcool.Tracer.SillyLogger.Level;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.image.*;
+import javafx.scene.image.Image;
+import javafx.scene.image.PixelReader;
+import javafx.scene.image.PixelWriter;
+import javafx.scene.image.WritableImage;
 import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
@@ -57,25 +60,18 @@ public class ImageManager {
         return (color.getRed() + color.getGreen() + color.getBlue()) / 3 * 255;
     }
 
-    public static WritableImage insetImage(
+    public WritableImage insetImage(
             Image img,
-            ImageView processedImageView
+            int canvasWidth,
+            int canvasHeight,
+            int posX,
+            int posY,
+            int targetWidth,
+            int targetHeight
     ) {
-        int canvasWidth = (int) processedImageView.getFitWidth();
-        int canvasHeight = (int) processedImageView.getFitHeight();
 
         int originalWidth = (int) img.getWidth();
         int originalHeight = (int) img.getHeight();
-
-        float factor = img.getWidth() > img.getHeight() ?
-                (float) canvasWidth / originalWidth :
-                (float) canvasHeight / originalHeight;
-
-        int targetWidth = (int) (originalWidth * factor);
-        int targetHeight = (int) (originalHeight * factor);
-
-        int posX = (int) ((canvasWidth - (originalWidth * factor)) / 2);
-        int posY = (int) ((canvasHeight - (originalHeight * factor)) / 2);
 
         WritableImage scaledImage = new WritableImage(canvasWidth, canvasHeight);
         PixelReader pixelReader = img.getPixelReader();
@@ -92,6 +88,7 @@ public class ImageManager {
                 int origX = (int) ((double) x / targetWidth * originalWidth);
                 int origY = (int) ((double) y / targetHeight * originalHeight);
                 Color color = pixelReader.getColor(origX, origY);
+                if (x + posX < 0 || x + posX > canvasWidth || y + posY < 0 || y + posY > canvasHeight) continue;
                 pixelWriter.setColor(x + posX, y + posY, color);
             }
         }
@@ -102,7 +99,7 @@ public class ImageManager {
     public void updateProcessed() {
         if (Main.imageManager.sourceImage == null) return;
         processedImage = applyThreshold(Main.imageManager.sourceImage, (int) Main.controller.threshold.getValue());
-        processedImage = insetImage(processedImage, Main.controller.filteredImage);
+        //processedImage = insetImage(processedImage, Settings.WIDTH, Settings.HEIGHT);
         Main.controller.filteredImage.setImage(processedImage);
     }
 }

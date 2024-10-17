@@ -2,13 +2,15 @@ package com.andcool.Tracer;
 
 
 import com.andcool.Tracer.Controllers.MainController;
-import com.andcool.Tracer.sillyLogger.Level;
-import com.andcool.Tracer.sillyLogger.SillyLogger;
+import com.andcool.Tracer.Settings.Settings;
+import com.andcool.Tracer.SillyLogger.Level;
+import com.andcool.Tracer.SillyLogger.SillyLogger;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.image.Image;
 import javafx.scene.image.WritableImage;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
@@ -28,10 +30,11 @@ public class Main extends Application {
     public static MainController controller;
 
     static List<String> gCode = new ArrayList<>();
-    static TraceThread thread1 = new TraceThread();
+    static TraceThread thread1 = new TraceThread(null);
 
     @Override
     public void start(Stage primaryStage) throws IOException {
+        Settings.load();
         primaryStage.setTitle("JavaFX Test");
 
         FXMLLoader loader = new FXMLLoader(getClass().getResource("mainView.fxml"));
@@ -41,19 +44,22 @@ public class Main extends Application {
         primaryStage.setScene(new Scene(root, 1920, 1000));
         primaryStage.show();
 
-        Thread.setDefaultUncaughtExceptionHandler((thread, throwable) -> {
-            logger.log(Level.ERROR, throwable, true);
-        });
+        Thread.setDefaultUncaughtExceptionHandler((thread, throwable) -> logger.log(Level.ERROR, throwable, true));
 
     }
 
     static class TraceThread extends Thread {
+        WritableImage processCanvas;
+
+        public TraceThread(WritableImage processCanvas) {
+            this.processCanvas = processCanvas;
+        }
+
         @Override
         public void run() {
             if (controller.filteredImage.getImage() == null) return;
             gCode.clear();
             Platform.runLater(() -> controller.pane.getChildren().clear());
-            WritableImage process_canvas = engine.copyImage(controller.filteredImage.getImage());
 
             engine.run((p1, p2, state) -> {
                 Line line = new Line(
@@ -71,7 +77,7 @@ public class Main extends Application {
                     uiUpdates.clear();
                     Platform.runLater(() -> controller.pane.getChildren().addAll(lines));
                 }
-            }, process_canvas);
+            }, this.processCanvas);
 
             if (uiUpdates.size() >= BATCH_SIZE) {
                 List<Line> lines = new ArrayList<>(uiUpdates);
@@ -96,7 +102,26 @@ public class Main extends Application {
 
     public static void render() {
         if (thread1.isAlive()) return;
-        thread1 = new TraceThread();
+
+        Image inputImage = controller.filteredImage.getImage();
+        int scaledOffsetX = (int) (inputImage.getWidth() - (controller.filteredImage.getScaleX() * inputImage.getWidth()));
+        int scaledOffsetY = (int) (inputImage.getHeight() - (controller.filteredImage.getScaleY() * inputImage.getHeight()));
+        WritableImage process_canvas = imageManager.insetImage(
+                inputImage,
+                Settings.WIDTH,
+                Settings.HEIGHT,
+                (int) controller.filteredImage.getTranslateX() + scaledOffsetX / 2,
+                (int) controller.filteredImage.getTranslateY() + scaledOffsetY / 2,
+                (int) (controller.filteredImage.getScaleX() * inputImage.getWidth() * ((double) 800 / Settings.WIDTH)),
+                (int) (controller.filteredImage.getScaleY() * inputImage.getHeight() * ((double) 800 / Settings.HEIGHT))
+        );
+
+        controller.pane.setTranslateX(0);
+        controller.pane.setTranslateY(0);
+        controller.pane.setScaleX(1);
+        controller.pane.setScaleY(1);
+
+        thread1 = new TraceThread(process_canvas);
         thread1.setDaemon(true);
         thread1.start();
     }
