@@ -17,6 +17,7 @@ public class Engine {
     private final Worker[] workers;
     public int lastWorker = 0;
     public int radius = 1;
+    public boolean lastState = false;
 
     Engine() {
         workers = new Worker[]{

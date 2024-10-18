@@ -3,7 +3,6 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.*?>
-<?import javafx.scene.shape.Rectangle?>
 <VBox xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
       fx:controller="com.andcool.Tracer.Controllers.MainController" spacing="10" stylesheets="@styles/main.css">
     <MenuBar>
@@ -14,7 +13,7 @@
     </MenuBar>
     <ToolBar>
         <Button text="Render" onAction="#render"/>
-        <Button text="Export"/>
+        <Button text="Export" onAction="#export"/>
     </ToolBar>
     <HBox spacing="10">
         <Slider fx:id="threshold" max="255"/>
@@ -22,8 +21,6 @@
     </HBox>
     <HBox spacing="10">
         <Pane
-                prefWidth="802"
-                prefHeight="802"
                 fx:id="processedContainer"
                 style="-fx-border-color: #000; -fx-border-width: 1px; -fx-border-style: solid;"
         >
@@ -31,18 +28,12 @@
                     fx:id="filteredImage"
                     smooth="false"
             />
-            <clip>
-                <Rectangle width="802" height="802"/>
-            </clip>
         </Pane>
 
         <Pane
                 prefWidth="802"
                 prefHeight="802"
                 fx:id="paneParent">
-            <clip>
-                <Rectangle width="802" height="802"/>
-            </clip>
             <Pane fx:id="pane" minWidth="800" minHeight="800"/>
         </Pane>
     </HBox>

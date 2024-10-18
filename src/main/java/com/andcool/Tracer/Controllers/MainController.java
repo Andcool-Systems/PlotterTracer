@@ -1,5 +1,6 @@
 package com.andcool.Tracer.Controllers;
 
+import com.andcool.Tracer.Files;
 import com.andcool.Tracer.Main;
 import com.andcool.Tracer.Settings.Settings;
 import javafx.event.ActionEvent;
@@ -14,9 +15,14 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.Pane;
+import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 
+import java.io.IOException;
+
 public class MainController {
+
+    public float factor = 1;
 
     @FXML
     public Slider threshold;
@@ -53,15 +59,19 @@ public class MainController {
 
     public void configure() {
 
-        float factor = Settings.WIDTH > Settings.HEIGHT ?
+        factor = Settings.WIDTH > Settings.HEIGHT ?
                 (float) 800 / Settings.WIDTH :
                 (float) 800 / Settings.HEIGHT;
 
-        processedContainer.setPrefWidth(Settings.WIDTH * factor + 2);
-        processedContainer.setPrefHeight(Settings.HEIGHT * factor + 2);
+        processedContainer.setPrefWidth(Settings.WIDTH * factor);
+        processedContainer.setPrefHeight(Settings.HEIGHT * factor);
+        Rectangle clip = new Rectangle(0, 0, Settings.WIDTH * factor + 2, Settings.HEIGHT * factor + 2);
+        processedContainer.setClip(clip);
 
-        //filteredImage.setFitWidth(Settings.WIDTH * factor);
-        //filteredImage.setFitHeight(Settings.HEIGHT * factor);
+        paneParent.setPrefWidth(Settings.WIDTH * factor);
+        paneParent.setPrefHeight(Settings.HEIGHT * factor);
+        Rectangle clipRender = new Rectangle(0, 0, Settings.WIDTH * factor + 2, Settings.HEIGHT * factor + 2);
+        paneParent.setClip(clipRender);
     }
 
     private void handleScroll(ScrollEvent event, Node node) {
@@ -132,5 +142,9 @@ public class MainController {
 
     public void openConfig(ActionEvent actionEvent) {
         Main.config.openSettingsWindow();
+    }
+
+    public void export(ActionEvent actionEvent) throws IOException {
+        Files.export(Main.gCode);
     }
 }

@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.scene.control.*?>
-<?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.layout.*?>
 <VBox xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml" spacing="5"
       fx:controller="com.andcool.Tracer.Controllers.ConfigController">
     <HBox alignment="CENTER_LEFT">
@@ -16,6 +15,10 @@
     <HBox alignment="CENTER_LEFT">
         <TextField onKeyTyped="#filterCharactersFloat" fx:id="line_width_el"/>
         <Label text="mm Line width" style="-fx-font-family: 'Roboto'; -fx-font-weight: bold;"/>
+    </HBox>
+    <HBox alignment="CENTER_LEFT" spacing="5">
+        <CheckBox onAction="#mirrorChange" fx:id="mirrorX"/>
+        <Label text="Отразить по-вертикали" style="-fx-font-family: 'Roboto'; -fx-font-weight: bold;"/>
     </HBox>
     <Button text="save" onAction="#save"/>
 </VBox>

@@ -8,6 +8,7 @@ import com.andcool.Tracer.SillyLogger.SillyLogger;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Point2D;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
@@ -20,6 +21,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import static java.lang.String.format;
+
 public class Main extends Application {
     private static final int BATCH_SIZE = 10;
     private static final List<Line> uiUpdates = new ArrayList<>();
@@ -29,8 +32,8 @@ public class Main extends Application {
     public static final Config config = new Config();
     public static MainController controller;
 
-    static List<String> gCode = new ArrayList<>();
-    static TraceThread thread1 = new TraceThread(null);
+    public static List<String> gCode = new ArrayList<>();
+    static TraceThread trace_thread = new TraceThread(null);
 
     @Override
     public void start(Stage primaryStage) throws IOException {
@@ -60,13 +63,13 @@ public class Main extends Application {
             if (controller.filteredImage.getImage() == null) return;
             gCode.clear();
             Platform.runLater(() -> controller.pane.getChildren().clear());
-
+            double factor = controller.processedContainer.getPrefWidth() / (Settings.WIDTH / Settings.LINE_WIDTH);
             engine.run((p1, p2, state) -> {
                 Line line = new Line(
-                        p1.getX(),
-                        p1.getY(),
-                        p2.getX(),
-                        p2.getY()
+                        p1.getX() * factor,
+                        p1.getY() * factor,
+                        p2.getX() * factor,
+                        p2.getY() * factor
                 );
                 line.setStroke(state ? Color.BLACK : Color.GREEN);
                 line.setStrokeWidth(0.5);
@@ -77,6 +80,20 @@ public class Main extends Application {
                     uiUpdates.clear();
                     Platform.runLater(() -> controller.pane.getChildren().addAll(lines));
                 }
+
+                double gcodeX = p2.getX() * Settings.LINE_WIDTH;
+                double gcodeY = p2.getY() * Settings.LINE_WIDTH;
+                if (Settings.MIRROR_X) gcodeX = Settings.WIDTH - gcodeX;
+
+                Point2D point = new Point2D(gcodeX, gcodeY);
+
+                float z = state ? 2.5f : 7;
+                if (state != engine.lastState) {
+                    gCode.addLast(format("G0 Z%f\n", z).replaceAll(",", "."));
+                    engine.lastState = state;
+                }
+                int speed = state ? 2200 : 3300;
+                gCode.addLast(format("G1 X%f Y%f F%d\n", point.getX() + 55, point.getY() + 55, speed).replaceAll(",", "."));
             }, this.processCanvas);
 
             if (uiUpdates.size() >= BATCH_SIZE) {
@@ -84,46 +101,35 @@ public class Main extends Application {
                 uiUpdates.clear();
                 Platform.runLater(() -> controller.pane.getChildren().addAll(lines));
             }
-            /*
-            Point2D point = new Point2D(
-                    pixelData.getX() / 800.f * 100.f + 60,
-                    pixelData.getY() / 800.f * 100.f + 55
-            );
-
-            float z = engine.radius == 1 ? 2.5f : 7;
-            if (z != last_z) {
-                gCode.addLast(format("G0 Z%f\n", z).replaceAll(",", "."));
-                last_z = z;
-            }
-            gCode.addLast(format("G1 X%f Y%f F2200\n", point.getX(), point.getY()).replaceAll(",", "."));
-             */
         }
     }
 
     public static void render() {
-        if (thread1.isAlive()) return;
+        if (trace_thread.isAlive()) return;
 
         Image inputImage = controller.filteredImage.getImage();
         int scaledOffsetX = (int) (inputImage.getWidth() - (controller.filteredImage.getScaleX() * inputImage.getWidth()));
         int scaledOffsetY = (int) (inputImage.getHeight() - (controller.filteredImage.getScaleY() * inputImage.getHeight()));
+        double canvasWidth = Settings.WIDTH / Settings.LINE_WIDTH;
+        double canvasHeight = Settings.HEIGHT / Settings.LINE_WIDTH;
+        double factor = canvasWidth / controller.processedContainer.getPrefWidth();
         WritableImage process_canvas = imageManager.insetImage(
                 inputImage,
-                Settings.WIDTH,
-                Settings.HEIGHT,
-                (int) controller.filteredImage.getTranslateX() + scaledOffsetX / 2,
-                (int) controller.filteredImage.getTranslateY() + scaledOffsetY / 2,
-                (int) (controller.filteredImage.getScaleX() * inputImage.getWidth() * ((double) 800 / Settings.WIDTH)),
-                (int) (controller.filteredImage.getScaleY() * inputImage.getHeight() * ((double) 800 / Settings.HEIGHT))
+                (int) canvasWidth,
+                (int) canvasHeight,
+                (int) ((controller.filteredImage.getTranslateX() + (double) scaledOffsetX / 2) * factor),
+                (int) ((controller.filteredImage.getTranslateY() + (double) scaledOffsetY / 2) * factor),
+                (int) (controller.filteredImage.getScaleX() * inputImage.getWidth() * factor),
+                (int) (controller.filteredImage.getScaleY() * inputImage.getHeight() * factor)
         );
-
         controller.pane.setTranslateX(0);
         controller.pane.setTranslateY(0);
         controller.pane.setScaleX(1);
         controller.pane.setScaleY(1);
 
-        thread1 = new TraceThread(process_canvas);
-        thread1.setDaemon(true);
-        thread1.start();
+        trace_thread = new TraceThread(process_canvas);
+        trace_thread.setDaemon(true);
+        trace_thread.start();
     }
 
     public static void main(String[] args) {

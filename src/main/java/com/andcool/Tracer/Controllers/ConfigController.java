@@ -3,7 +3,9 @@ package com.andcool.Tracer.Controllers;
 import com.andcool.Tracer.Config;
 import com.andcool.Tracer.Main;
 import com.andcool.Tracer.Settings.Settings;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyEvent;
 
@@ -14,6 +16,7 @@ public class ConfigController {
     public TextField width_el;
     public TextField height_el;
     public TextField line_width_el;
+    public CheckBox mirrorX;
 
     public void filterCharacters(KeyEvent keyEvent) {
         TextField target = (TextField) (keyEvent.getTarget());
@@ -61,5 +64,10 @@ public class ConfigController {
         width_el.setText(String.valueOf(Settings.WIDTH));
         height_el.setText(String.valueOf(Settings.HEIGHT));
         line_width_el.setText(String.valueOf(Settings.LINE_WIDTH));
+        mirrorX.setSelected(Settings.MIRROR_X);
+    }
+
+    public void mirrorChange(ActionEvent actionEvent) {
+        Settings.MIRROR_X = ((CheckBox) actionEvent.getTarget()).isSelected();
     }
 }
