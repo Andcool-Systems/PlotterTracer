@@ -8,6 +8,7 @@ import javafx.fxml.FXML;
 import javafx.geometry.Point2D;
 import javafx.scene.Cursor;
 import javafx.scene.Node;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.Slider;
@@ -31,6 +32,9 @@ public class MainController {
     public Pane paneParent;
     public Pane pane;
     public Pane processedContainer;
+    public Slider smoothStep;
+    public Label smoothStepLabel;
+    public CheckBox displayTravel;
 
     public void loadImage(ActionEvent actionEvent) {
         Stage stage = (Stage) ((MenuItem) actionEvent.getTarget()).getParentPopup().getOwnerWindow();
@@ -44,6 +48,11 @@ public class MainController {
             thresholdLabel.setText("Threshold: " + newValue.intValue());
             Main.imageManager.updateProcessed();
         });
+
+        smoothStep.valueProperty().addListener((observable, oldValue, newValue) -> {
+            smoothStepLabel.setText("Smooth steps: " + newValue.intValue());
+        });
+
         pane.addEventFilter(ScrollEvent.SCROLL, event -> handleScroll(event, pane));
         paneParent.setOnMousePressed(this::handleMousePressed);
         paneParent.setOnMouseDragged(this::handleMouseDragged);

@@ -18,6 +18,7 @@ public class Engine {
     public int lastWorker = 0;
     public int radius = 1;
     public boolean lastState = false;
+    public Point2D savedPoint = new Point2D(0, 0);
 
     Engine() {
         workers = new Worker[]{
@@ -100,31 +101,14 @@ public class Engine {
         }
     }
 
-    public WritableImage copyImage(Image inputImage) {
-        int width = (int) inputImage.getWidth();
-        int height = (int) inputImage.getHeight();
-
-        WritableImage writableImage = new WritableImage(width, height);
-        PixelReader pixelReader = inputImage.getPixelReader();
-
-        PixelWriter pixelWriter = writableImage.getPixelWriter();
-
-        for (int y = 0; y < height; y++) {
-            for (int x = 0; x < width; x++) {
-                Color color = pixelReader.getColor(x, y);
-                pixelWriter.setColor(x, y, color);
-            }
-        }
-        return writableImage;
-    }
-
     public void run(Callback callback, WritableImage process_canvas) {
         Point2D last_pixel = new Point2D(0, 0);
         PixelWriter canvasWriter = process_canvas.getPixelWriter();
         boolean lastDown = false;
         double lastAngle = 0;
         lastWorker = 0;
-        Point2D savedPoint = new Point2D(0, 0);
+        savedPoint = new Point2D(0, 0);
+        int counter = 0;
 
         while (true) {
             try {
@@ -140,16 +124,26 @@ public class Engine {
                         pixelData.getY()
                 );
 
+                if (down != lastDown || ((counter > Main.controller.smoothStep.getValue() || angle != lastAngle) && lastDown)) {
+                    Point2D next_point;
+                    if (!lastDown) {
+                        next_point = last_pixel;
+                    } else {
+                        next_point = new Point2D(
+                                (savedPoint.getX() + last_pixel.getX()) / 2,
+                                (savedPoint.getY() + last_pixel.getY()) / 2);
+                    }
 
-                if (angle != lastAngle || down != lastDown) {
-                    callback.execute(savedPoint, last_pixel, lastDown);
+                    callback.execute(savedPoint, next_point, lastDown);
 
                     lastAngle = angle;
-                    savedPoint = last_pixel;
+                    savedPoint = next_point;
                     lastDown = down;
+                    counter = 0;
                 }
 
                 last_pixel = pixelData;
+                ++counter;
             } catch (Throwable throwable) {
                 logger.log(Level.ERROR, throwable, true);
                 break;

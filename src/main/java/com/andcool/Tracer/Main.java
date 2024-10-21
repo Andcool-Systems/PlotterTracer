@@ -62,6 +62,7 @@ public class Main extends Application {
         public void run() {
             if (controller.filteredImage.getImage() == null) return;
             gCode.clear();
+
             Platform.runLater(() -> controller.pane.getChildren().clear());
             double factor = controller.processedContainer.getPrefWidth() / (Settings.WIDTH / Settings.LINE_WIDTH);
             engine.run((p1, p2, state) -> {
@@ -71,7 +72,8 @@ public class Main extends Application {
                         p2.getX() * factor,
                         p2.getY() * factor
                 );
-                line.setStroke(state ? Color.BLACK : Color.GREEN);
+
+                line.setStroke(state ? Color.BLACK : (controller.displayTravel.isSelected() ? Color.GREEN : Color.TRANSPARENT));
                 line.setStrokeWidth(0.5);
                 uiUpdates.add(line);
 
@@ -92,11 +94,12 @@ public class Main extends Application {
                     gCode.addLast(format("G0 Z%f\n", z).replaceAll(",", "."));
                     engine.lastState = state;
                 }
+
                 int speed = state ? 2200 : 3300;
                 gCode.addLast(format("G1 X%f Y%f F%d\n", point.getX() + 55, point.getY() + 55, speed).replaceAll(",", "."));
             }, this.processCanvas);
 
-            if (uiUpdates.size() >= BATCH_SIZE) {
+            if (!uiUpdates.isEmpty()) {
                 List<Line> lines = new ArrayList<>(uiUpdates);
                 uiUpdates.clear();
                 Platform.runLater(() -> controller.pane.getChildren().addAll(lines));
