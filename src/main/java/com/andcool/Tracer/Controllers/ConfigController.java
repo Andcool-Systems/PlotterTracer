@@ -17,6 +17,8 @@ public class ConfigController {
     public TextField height_el;
     public TextField line_width_el;
     public CheckBox mirrorX;
+    public TextField offsetX;
+    public TextField offsetY;
 
     public void filterCharacters(KeyEvent keyEvent) {
         TextField target = (TextField) (keyEvent.getTarget());
@@ -53,6 +55,9 @@ public class ConfigController {
             Settings.LINE_WIDTH = 0.5F;
         }
 
+        Settings.X_OFFSET = Float.parseFloat(offsetX.getText());
+        Settings.Y_OFFSET = Float.parseFloat(offsetY.getText());
+
         Settings.save();
         Config.settingsStage.close();
         Main.controller.configure();
@@ -65,6 +70,8 @@ public class ConfigController {
         height_el.setText(String.valueOf(Settings.HEIGHT));
         line_width_el.setText(String.valueOf(Settings.LINE_WIDTH));
         mirrorX.setSelected(Settings.MIRROR_X);
+        offsetX.setText(String.valueOf(Settings.X_OFFSET));
+        offsetY.setText(String.valueOf(Settings.Y_OFFSET));
     }
 
     public void mirrorChange(ActionEvent actionEvent) {

@@ -20,5 +20,13 @@
         <CheckBox onAction="#mirrorChange" fx:id="mirrorX"/>
         <Label text="Отразить по-вертикали" style="-fx-font-family: 'Roboto'; -fx-font-weight: bold;"/>
     </HBox>
+    <HBox alignment="CENTER_LEFT">
+        <TextField onKeyTyped="#filterCharactersFloat" fx:id="offsetX"/>
+        <Label text="mm X offset" style="-fx-font-family: 'Roboto'; -fx-font-weight: bold;"/>
+    </HBox>
+    <HBox alignment="CENTER_LEFT">
+        <TextField onKeyTyped="#filterCharactersFloat" fx:id="offsetY"/>
+        <Label text="mm Y offset" style="-fx-font-family: 'Roboto'; -fx-font-weight: bold;"/>
+    </HBox>
     <Button text="save" onAction="#save"/>
 </VBox>

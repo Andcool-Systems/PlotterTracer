@@ -6,6 +6,7 @@ build/
 
 .idea
 test.gcode
+config.json
 
 ### IntelliJ IDEA ###
 .idea/modules.xml

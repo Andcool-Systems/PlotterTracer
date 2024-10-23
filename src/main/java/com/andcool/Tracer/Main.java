@@ -96,7 +96,7 @@ public class Main extends Application {
                 }
 
                 int speed = state ? 2200 : 3300;
-                gCode.addLast(format("G1 X%f Y%f F%d\n", point.getX() + 55, point.getY() + 55, speed).replaceAll(",", "."));
+                gCode.addLast(format("G1 X%f Y%f F%d\n", point.getX() + Settings.X_OFFSET, point.getY() + Settings.Y_OFFSET, speed).replaceAll(",", "."));
             }, this.processCanvas);
 
             if (!uiUpdates.isEmpty()) {

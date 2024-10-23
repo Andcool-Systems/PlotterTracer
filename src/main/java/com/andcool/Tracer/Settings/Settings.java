@@ -13,6 +13,8 @@ public class Settings {
     public static int HEIGHT = 100;
     public static float LINE_WIDTH = 0.5F;
     public static boolean MIRROR_X = false;
+    public static float X_OFFSET = 0;
+    public static float Y_OFFSET = 0;
 
     /*
     Save config to file
@@ -24,6 +26,8 @@ public class Settings {
         jsonConfig.put("HEIGHT", HEIGHT);
         jsonConfig.put("LINE_WIDTH", LINE_WIDTH);
         jsonConfig.put("MIRROR_X", MIRROR_X);
+        jsonConfig.put("X_OFFSET", X_OFFSET);
+        jsonConfig.put("Y_OFFSET", Y_OFFSET);
         try {
             Files.createDirectories(configFile.toPath().getParent());
             Files.writeString(configFile.toPath(), jsonConfig.toString(4));
@@ -45,6 +49,8 @@ public class Settings {
                     case "HEIGHT" -> HEIGHT = jsonConfig.getInt(key);
                     case "LINE_WIDTH" -> LINE_WIDTH = jsonConfig.getFloat(key);
                     case "MIRROR_X" -> MIRROR_X = jsonConfig.getBoolean(key);
+                    case "X_OFFSET" -> X_OFFSET = jsonConfig.getFloat(key);
+                    case "Y_OFFSET" -> Y_OFFSET = jsonConfig.getFloat(key);
                 }
             }
             Main.logger.log(Level.DEBUG, "Settings loaded!");
