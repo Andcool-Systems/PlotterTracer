@@ -108,7 +108,9 @@ public class Main extends Application {
     }
 
     public static void render() {
-        if (trace_thread.isAlive()) return;
+        if (trace_thread.isAlive()) {
+            trace_thread.interrupt();
+        }
 
         Image inputImage = controller.filteredImage.getImage();
         int scaledOffsetX = (int) (inputImage.getWidth() - (controller.filteredImage.getScaleX() * inputImage.getWidth()));

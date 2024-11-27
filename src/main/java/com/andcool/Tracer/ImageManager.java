@@ -57,7 +57,7 @@ public class ImageManager {
     }
 
     private static double getLuminance(Color color) {
-        return (color.getRed() + color.getGreen() + color.getBlue()) / 3 * 255;
+        return color.getOpacity() > 0 ? (color.getRed() + color.getGreen() + color.getBlue()) / 3 * 255 : 255;
     }
 
     public WritableImage insetImage(
@@ -69,7 +69,6 @@ public class ImageManager {
             int targetWidth,
             int targetHeight
     ) {
-
         int originalWidth = (int) img.getWidth();
         int originalHeight = (int) img.getHeight();
 

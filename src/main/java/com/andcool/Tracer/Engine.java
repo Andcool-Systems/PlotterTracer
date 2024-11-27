@@ -116,7 +116,7 @@ public class Engine {
                 if (pixelData == null) break;
                 canvasWriter.setColor((int) last_pixel.getX(), (int) last_pixel.getY(), Color.WHITE);
 
-                boolean down = radius == 1;
+                boolean down = radius <= Main.controller.travelRange.getValue();
                 double angle = getAngle(
                         last_pixel.getX(),
                         last_pixel.getY(),

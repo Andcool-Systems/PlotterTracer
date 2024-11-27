@@ -22,6 +22,9 @@
         <Slider fx:id="smoothStep" max="10"/>
         <Label fx:id="smoothStepLabel" text="Smooth steps: 0"/>
 
+        <Slider fx:id="travelRange" max="50" min="1"/>
+        <Label fx:id="travelRangeLabel" text="Travel range: 1"/>
+
         <CheckBox text="Display travel" fx:id="displayTravel" selected="true" onAction="#render"/>
     </HBox>
     <HBox spacing="10">

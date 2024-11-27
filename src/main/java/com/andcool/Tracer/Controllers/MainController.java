@@ -35,6 +35,8 @@ public class MainController {
     public Slider smoothStep;
     public Label smoothStepLabel;
     public CheckBox displayTravel;
+    public Slider travelRange;
+    public Label travelRangeLabel;
 
     public void loadImage(ActionEvent actionEvent) {
         Stage stage = (Stage) ((MenuItem) actionEvent.getTarget()).getParentPopup().getOwnerWindow();
@@ -51,6 +53,10 @@ public class MainController {
 
         smoothStep.valueProperty().addListener((observable, oldValue, newValue) -> {
             smoothStepLabel.setText("Smooth steps: " + newValue.intValue());
+        });
+
+        travelRange.valueProperty().addListener((observable, oldValue, newValue) -> {
+            travelRangeLabel.setText("Travel range: " + newValue.intValue());
         });
 
         pane.addEventFilter(ScrollEvent.SCROLL, event -> handleScroll(event, pane));
